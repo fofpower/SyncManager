@@ -1,0 +1,10 @@
+{
+  "schema": [
+    "product",
+    "product_mutual"
+  ],
+  "schema_map": {
+    "product": "product_private",
+    "product_mutual": "product_mutual"
+  }
+}

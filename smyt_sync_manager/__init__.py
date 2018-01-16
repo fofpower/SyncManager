@@ -1,0 +1,1 @@
+from smyt_sync_manager.task import execute_from_commandline, sync_task
