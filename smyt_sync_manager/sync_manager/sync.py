@@ -3,12 +3,11 @@ from smyt_sync_manager.config import settings
 from smyt_sync_manager.config.settings import create_db_connection
 import multiprocessing
 from smyt_sync_manager.sync_manager import sync_helper
-from smyt_sync_manager.sync_manager.errors import UpdateError, NoConnection
+from smyt_sync_manager.config.errors import UpdateError, NoConnection
 import os
-from smyt_sync_manager.sync_manager.fetch_key_column import fetch_keys
 import json
 import pandas as pd
-from smyt_sync_manager.sync_manager.helper import to_sql, now
+from smyt_sync_manager.config.helper import to_sql, now
 from queue import Queue
 
 
@@ -28,7 +27,6 @@ def check_chfdb():
 
 def check_schema(schema):
     check_network()
-    check_configfile()
     check_status_file(schema)
     sync_helper.handle_status_file(schema, [0, 0, 1])
     print("Start checking schema {}".format(schema))
@@ -53,7 +51,6 @@ def sync_schema(schema):
 
 def update_schema(schema):
     check_network()
-    check_configfile()
     print(settings.DROP_DELETED)
     check_status_file(schema)
     print("Start updating schema {}".format(schema))
@@ -73,7 +70,6 @@ def update_schema(schema):
 
 def check_deleted(schema):
     check_network()
-    check_configfile()
     check_status_file(schema)
     print("Start remove deleted records from schema {}".format(schema))
     sync_helper.handle_status_file(schema, [0, 1, 0])
@@ -246,14 +242,6 @@ def check_network():
         pd.read_sql('show databases', _source_engine)
     except:
         raise NoConnection('E001', 'Connection Error, please check your internet connection!')
-
-
-def check_configfile():
-    _checked = []
-    for schema in settings.SYNC_SCHEMA:
-        _checked.append(os.path.exists(os.path.join(settings.DIR_PATH, '{}.json'.format(schema))))
-    if not all(_checked):
-        fetch_keys()
 
 
 def check_local_table(table_name, engine_source, engine_local):

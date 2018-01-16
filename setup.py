@@ -20,7 +20,7 @@ setup(
     classifiers=[
         'Development Status :: Pre-Alpha',
         'Environment :: Console',
-        'Intended Audience :: Customs',
+        'Intended Audience :: Custom',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',

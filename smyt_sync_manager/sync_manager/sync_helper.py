@@ -1,6 +1,6 @@
 from smyt_sync_manager.config import settings
 import pandas as pd
-from smyt_sync_manager.sync_manager.helper import to_sql, now
+from smyt_sync_manager.config.helper import to_sql, now
 import os
 import json
 
