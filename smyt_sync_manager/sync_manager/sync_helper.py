@@ -1,6 +1,6 @@
 from smyt_sync_manager.config import settings
 import pandas as pd
-from smyt_sync_manager.config.helper import to_sql, now
+from smyt_sync_manager.utils import to_sql, now
 import os
 import json
 
@@ -59,7 +59,7 @@ def update_by_keys(table_name, key_columns, key_values, source_engine, local_eng
     insert_records = pd.read_sql(sql, source_engine)
     nums = len(insert_records)
     if nums:
-        print("{}: {}--{} new records partially updating!\n".format(now(), table_name, nums))
+        print("{}: {} -- {} new records partially updating!\n".format(now(), table_name, nums))
         # noinspection PyBroadException
         try:
             to_sql(table_name, local_engine, insert_records)
@@ -67,7 +67,7 @@ def update_by_keys(table_name, key_columns, key_values, source_engine, local_eng
             log_insert = 'Error occur while inserting, switch to insert one by one'
             save_log(table_name, 0, log_insert, 'INSERT-0', local_engine)
             to_sql(table_name, local_engine, insert_records, chunksize=10)
-        log = '{} records partially update without error!'.format(nums)
+        log = '{} records partially updated without error!'.format(nums)
         save_log(table_name, 1, log, 'UPDATE-0', local_engine)
     return nums
 
@@ -75,7 +75,7 @@ def update_by_keys(table_name, key_columns, key_values, source_engine, local_eng
 def delete_by_keys(table, key_columns, key_values, engine):
     nums = len(key_values)
     if nums:
-        print("{}: {}--{} records partially deleting!\n".format(
+        print("{}: {} -- {} records partially deleting!\n".format(
             now(), table, nums))
         sql = "DELETE FROM {} WHERE {}".format(table, _format_sql(key_columns, key_values))
         engine.execute(sql)

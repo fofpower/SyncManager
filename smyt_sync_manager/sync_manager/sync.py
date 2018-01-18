@@ -3,11 +3,11 @@ from smyt_sync_manager.config import settings
 from smyt_sync_manager.config.settings import create_db_connection
 import multiprocessing
 from smyt_sync_manager.sync_manager import sync_helper
-from smyt_sync_manager.config.errors import UpdateError, NoConnection
+from smyt_sync_manager.err import UpdateError, NoConnection
 import os
 import json
 import pandas as pd
-from smyt_sync_manager.config.helper import to_sql, now
+from smyt_sync_manager.utils import to_sql, now
 from queue import Queue
 
 

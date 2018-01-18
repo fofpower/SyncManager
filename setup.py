@@ -13,7 +13,7 @@ setup(
     install_requires=['pandas', 'sqlalchemy', 'pymysql', 'pyyaml'],
     entry_points={
         'console_scripts': [
-            'smyt-sync-task = smyt_sync_manager:execute_from_commandline',
+            'smyt-sync-task = smyt_sync_manager.task:execute_from_commandline',
         ],
     },
     zip_safe=False,

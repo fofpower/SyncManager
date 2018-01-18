@@ -1,6 +1,4 @@
 import os
-from smyt_sync_manager import config
-config.DIR_PATH = os.getcwd()
 from smyt_sync_manager.config import settings
 from smyt_sync_manager.sync_manager.sync import sync_chfdb, check_chfdb, update_schema, check_schema, check_deleted, sync_schema, \
     sync_table
