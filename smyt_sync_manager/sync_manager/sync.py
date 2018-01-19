@@ -141,9 +141,14 @@ def update_table(param):
     status.update({'latest_update_time': latest_update_time, 'updated': updated_num,
                    'error_info': update_error, 'end_time': now()})
     if update_error:
-        status.update({'status': 'Break'})
-        sync_helper.save_log(table_name, 0, "Break updating with error {}".format(update_error), 'UPDATE-1',
+        status.update({'status': 'Break', 'updated': 0})
+        sync_helper.save_log(table_name, 0, "Break with updating with error {}".format(update_error), 'UPDATE-1',
                              _local_engine)
+
+        sql = "DELETE FROM {} WHERE update_time > {}".format(table_name, latest_update_time)
+        _local_engine.execute(sql)
+        sync_helper.save_log(table_name, 0, "Rollback with error {}".format(update_error), 'UPDATE-1', _local_engine)
+
     sync_helper.save_log(table_name, 1, "ALL records updated", 'UPDATE-1', _local_engine)
     save_sync_status(status, _local_engine)
 

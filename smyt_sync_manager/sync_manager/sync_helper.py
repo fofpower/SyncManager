@@ -59,15 +59,13 @@ def update_by_keys(table_name, key_columns, key_values, source_engine, local_eng
     insert_records = pd.read_sql(sql, source_engine)
     nums = len(insert_records)
     if nums:
-        print("{}: {} -- {} new records partially updating!\n".format(now(), table_name, nums))
+        print("{}: {} -- {} new records updating!\n".format(now(), table_name, nums))
         # noinspection PyBroadException
         try:
             to_sql(table_name, local_engine, insert_records)
         except Exception:
-            log_insert = 'Error occur while inserting, switch to insert one by one'
-            save_log(table_name, 0, log_insert, 'INSERT-0', local_engine)
             to_sql(table_name, local_engine, insert_records, chunksize=10)
-        log = '{} records partially updated without error!'.format(nums)
+        log = '{} records updated!'.format(nums)
         save_log(table_name, 1, log, 'UPDATE-0', local_engine)
     return nums
 
@@ -75,14 +73,14 @@ def update_by_keys(table_name, key_columns, key_values, source_engine, local_eng
 def delete_by_keys(table, key_columns, key_values, engine):
     nums = len(key_values)
     if nums:
-        print("{}: {} -- {} records partially deleting!\n".format(
+        print("{}: {} -- {} records deleting!\n".format(
             now(), table, nums))
         sql = "DELETE FROM {} WHERE {}".format(table, _format_sql(key_columns, key_values))
         engine.execute(sql)
         _deleted = pd.DataFrame(key_values, columns=key_columns)
         _deleted['table_name'] = table
         to_sql('sync_deleted_keys', engine, _deleted)
-        log = "{} records partially deleted without error!".format(nums)
+        log = "{} records deleted!".format(nums)
         save_log(table, 1, log, 'DELETE-0', engine)
     return nums
 
