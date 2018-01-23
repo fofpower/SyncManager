@@ -131,7 +131,7 @@ def fetch_distinct_keys(table, main_key_values, key_columns, engine, latest=None
 def fetch_unique_main_key(table, main_key, engine, latest):
     mk = main_key
     if main_key in ('statistic_date', 'statistic_date_std'):
-        mk = "DATE_FORMAT(max({}), '%%Y-%%m-%%d') as {}".format(main_key, main_key)
+        mk = "DATE_FORMAT({}, '%%Y-%%m-%%d') as {}".format(main_key, main_key)
     sql = "SELECT DISTINCT {} FROM {} WHERE update_time <= '{}' ORDER BY {}".format(mk, table, latest, main_key)
     return pd.read_sql(sql, engine)[main_key].tolist()
 
