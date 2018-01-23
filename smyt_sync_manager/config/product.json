@@ -1,8 +1,93 @@
 {
-  "fund_month_return": [
+  "org_monthly_index_static": [
+    "org_id",
+    "statistic_date",
+    "index_id"
+  ],
+  "fund_weekly_index": [
+    "index_id",
+    "statistic_date",
+    "index_method",
+    "data_source"
+  ],
+  "org_monthly_return": [
+    "org_id",
+    "statistic_date",
+    "index_id",
+    "benchmark"
+  ],
+  "index_monthly_return": [
+    "index_id",
+    "statistic_date"
+  ],
+  "index_weekly_risk": [
+    "index_id",
+    "statistic_date"
+  ],
+  "org_month_routine": [
+    "org_id",
+    "statistic_date",
+    "benchmark",
+    "index_method",
+    "index_range"
+  ],
+  "org_month_research": [
+    "org_id",
+    "benchmark",
+    "index_method",
+    "index_range",
+    "statistic_date"
+  ],
+  "org_monthly_index": [
+    "org_id",
+    "statistic_date",
+    "index_id"
+  ],
+  "fund_month_risk2": [
     "fund_id",
     "statistic_date",
     "benchmark"
+  ],
+  "fund_month_subsidiary2": [
+    "fund_id",
+    "statistic_date",
+    "benchomark"
+  ],
+  "fund_allocation_data": [
+    "fund_id",
+    "statistic_date",
+    "source_code"
+  ],
+  "org_month_return": [
+    "org_id",
+    "statistic_date",
+    "benchmark",
+    "index_method",
+    "index_range"
+  ],
+  "fund_weekly_subsidiary2": [
+    "fund_id",
+    "statistic_date",
+    "benchmark"
+  ],
+  "fund_month_index": [
+    "index_id",
+    "statistic_date",
+    "index_method",
+    "data_source"
+  ],
+  "fund_nv_standard_w": [
+    "fund_id",
+    "statistic_date_std"
+  ],
+  "fund_org_mapping": [
+    "fund_id",
+    "org_id",
+    "org_type_code"
+  ],
+  "fund_asset_scale": [
+    "fund_id",
+    "statistic_date"
   ],
   "fund_security_data": [
     "fund_id",
@@ -16,12 +101,77 @@
     "statistic_date",
     "data_source"
   ],
-  "org_month_return": [
+  "index_weekly_table": [
+    "index_id",
+    "statistic_date"
+  ],
+  "fund_fee_data": [
+    "fund_id",
+    "fee_type_code",
+    "fee_level"
+  ],
+  "org_monthly_research": [
     "org_id",
     "statistic_date",
-    "benchmark",
+    "index_id",
+    "benchmark"
+  ],
+  "fund_month_risk": [
+    "fund_id",
+    "statistic_date",
+    "benchmark"
+  ],
+  "fund_month_return": [
+    "fund_id",
+    "statistic_date",
+    "benchmark"
+  ],
+  "fund_weekly_risk": [
+    "fund_id",
+    "statistic_date",
+    "benchmark"
+  ],
+  "index_weekly_subsidiary": [
+    "index_id",
+    "statistic_date"
+  ],
+  "index_monthly_subsidiary": [
+    "index_id",
+    "statistic_date"
+  ],
+  "org_month_risk": [
+    "org_id",
     "index_method",
-    "index_range"
+    "index_range",
+    "benchmark",
+    "statistic_date"
+  ],
+  "fund_nv_standard_m": [
+    "fund_id",
+    "statistic_date_std"
+  ],
+  "fund_portfolio": [
+    "fund_id",
+    "subfund_id",
+    "portfolio_type"
+  ],
+  "fund_info": [
+    "fund_id"
+  ],
+  "org_weekly_index_static": [
+    "org_id",
+    "statistic_date",
+    "index_id"
+  ],
+  "manager_resume": [
+    "id"
+  ],
+  "index_monthly_risk": [
+    "index_id",
+    "statistic_date"
+  ],
+  "market_index": [
+    "statistic_date"
   ],
   "fund_weekly_subsidiary": [
     "fund_id",
@@ -32,175 +182,46 @@
     "index_id",
     "statistic_date"
   ],
-  "fund_month_subsidiary2": [
-    "fund_id",
-    "statistic_date",
-    "benchmark"
-  ],
-  "org_month_risk": [
+  "org_weekly_index": [
     "org_id",
-    "index_method",
-    "index_range",
-    "benchmark",
-    "statistic_date"
-  ],
-  "fund_nv_standard_w": [
-    "fund_id",
-    "statistic_date_std"
+    "statistic_date",
+    "index_id"
   ],
   "index_month_table": [
     "index_id",
     "statistic_date"
   ],
-  "org_monthly_research": [
-    "org_id",
-    "statistic_date",
-    "index_id",
-    "benchmark"
+  "fund_manager_mapping": [
+    "fund_id",
+    "user_id"
+  ],
+  "fund_nv_data_standard": [
+    "fund_id",
+    "statistic_date"
   ],
   "fund_weekly_return": [
     "fund_id",
     "statistic_date",
     "benchmark"
   ],
-  "fund_month_risk": [
-    "fund_id",
-    "statistic_date",
-    "benchmark"
-  ],
-  "fund_weekly_index": [
-    "index_id",
-    "statistic_date",
-    "index_method",
-    "data_source"
-  ],
-  "fund_month_index": [
-    "index_id",
-    "statistic_date",
-    "index_method",
-    "data_source"
-  ],
-  "index_monthly_return": [
-    "index_id",
-    "statistic_date"
-  ],
-  "fund_asset_scale": [
-    "fund_id",
-    "statistic_date"
-  ],
-  "index_monthly_subsidiary": [
-    "index_id",
-    "statistic_date"
-  ],
-  "org_info": [
-    "org_id"
-  ],
-  "org_monthly_risk": [
-    "org_id",
-    "statistic_date",
-    "index_id",
-    "benchmark"
-  ],
-  "index_monthly_risk": [
-    "index_id",
-    "statistic_date"
-  ],
-  "fund_nv_data_standard": [
-    "fund_id",
-    "statistic_date"
-  ],
-  "market_index": [
-    "statistic_date"
-  ],
-  "fund_info": [
-    "fund_id"
-  ],
-  "fund_nv_standard_m": [
-    "fund_id",
-    "statistic_date_std"
-  ],
-  "index_weekly_subsidiary": [
-    "index_id",
-    "statistic_date"
-  ],
   "fund_type_mapping": [
     "fund_id",
     "typestandard_code"
-  ],
-  "org_monthly_index": [
-    "org_id",
-    "statistic_date",
-    "index_id"
-  ],
-  "index_weekly_risk": [
-    "index_id",
-    "statistic_date"
-  ],
-  "org_monthly_return": [
-    "org_id",
-    "statistic_date",
-    "index_id",
-    "benchmark"
-  ],
-  "fund_weekly_subsidiary2": [
-    "fund_id",
-    "statistic_date",
-    "benchmark"
-  ],
-  "org_month_routine": [
-    "org_id",
-    "statistic_date",
-    "benchmark",
-    "index_method",
-    "index_range"
-  ],
-  "fund_allocation_data": [
-    "fund_id",
-    "statistic_date",
-    "source_code"
-  ],
-  "fund_weekly_risk2": [
-    "fund_id",
-    "statistic_date",
-    "benchmark"
-  ],
-  "fund_org_mapping": [
-    "fund_id",
-    "org_id",
-    "org_type_code"
-  ],
-  "org_month_research": [
-    "org_id",
-    "benchmark",
-    "index_method",
-    "index_range",
-    "statistic_date"
   ],
   "org_executive_info": [
     "org_id",
     "name",
     "duty"
   ],
-  "fund_manager_mapping": [
-    "fund_id",
-    "user_id"
+  "org_info": [
+    "org_id"
   ],
-  "fund_portfolio": [
-    "fund_id",
-    "subfund_id",
-    "portfolio_type"
-  ],
-  "fund_fee_data": [
-    "fund_id",
-    "fee_type_code",
-    "fee_level"
-  ],
-  "fund_weekly_risk": [
+  "fund_month_subsidiary": [
     "fund_id",
     "statistic_date",
     "benchmark"
   ],
-  "fund_month_subsidiary": [
+  "fund_weekly_risk2": [
     "fund_id",
     "statistic_date",
     "benchmark"
@@ -209,16 +230,10 @@
     "user_id",
     "org_id"
   ],
-  "index_weekly_table": [
-    "index_id",
-    "statistic_date"
-  ],
-  "manager_resume": [
-    "id"
-  ],
-  "fund_month_risk2": [
-    "fund_id",
+  "org_monthly_risk": [
+    "org_id",
     "statistic_date",
+    "index_id",
     "benchmark"
   ]
 }
