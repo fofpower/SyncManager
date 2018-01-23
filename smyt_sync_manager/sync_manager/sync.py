@@ -115,9 +115,10 @@ def check_table(param):
     if not check_local_table(table_name, _source_engine, _local_engine):
         structure_changed_error(table_name, status, _local_engine)
         return
-    updated_num, deleted_num, check_error = check_keys_sync(table_name, key_columns, _source_engine,
-                                                            _local_engine)
-    status.update({'end_time': now(), 'updated': updated_num, 'deleted': deleted_num, 'error_info': check_error})
+    updated_num, deleted_num, check_error, latest_update_time = check_keys_sync(table_name, key_columns, _source_engine,
+                                                                                _local_engine)
+    status.update({'end_time': now(), 'updated': updated_num, 'deleted': deleted_num,
+                   'error_info': check_error, 'latest_update_time': latest_update_time})
     if check_error:
         status.update({'status': 'Break'})
         sync_helper.save_log(table_name, 0, "Break while checking with error {}".format(check_error), 'CHECK-1',
@@ -164,8 +165,10 @@ def remove_deleted_records(param):
     if not check_local_table(table_name, _source_engine, _local_engine):
         structure_changed_error(table_name, status, _local_engine)
         return
-    deleted_num, delete_error = delete_record(table_name, key_columns, _source_engine, _local_engine)
-    status.update({'end_time': now(), 'deleted': deleted_num, 'error_info': delete_error})
+    deleted_num, delete_error, latest_update_time = delete_record(table_name, key_columns, _source_engine,
+                                                                  _local_engine)
+    status.update({'end_time': now(), 'deleted': deleted_num, 'error_info': delete_error,
+                   'latest_update_time': latest_update_time})
     if delete_error:
         status.update({'status': 'Break'})
         sync_helper.save_log(table_name, 0, "Break while deleting with error {}".format(delete_error), 'DELETE-1',
@@ -175,11 +178,12 @@ def remove_deleted_records(param):
 
 
 def update_table_by_latest_time(table_name, key_columns, engine_source, engine_local):
-    latest_update_time = sync_helper.query_local_table_latest_time(table_name, engine_local)
+    local_ut = sync_helper.query_local_table_latest_time(table_name, engine_local)
 
-    new_record_num = sync_helper.query_new_record_amount(table_name, engine_source, latest_update_time)
+    new_record_num, source_ut = sync_helper.query_new_record_amount(table_name, engine_source, local_ut)
     key_values_generator = sync_helper.main_key_values_generator(table_name, key_columns, engine_source,
-                                                                 latest_update_time, new_record_num)
+                                                                 {'min': local_ut, 'max': source_ut},
+                                                                 new_record_num)
 
     update_jobs = Queue()
     update_results = Queue()
@@ -195,7 +199,7 @@ def update_table_by_latest_time(table_name, key_columns, engine_source, engine_l
     threading_update.add_jobs(key_values_generator)
 
     updated_num, error_status = threading_update.process()
-    return latest_update_time, updated_num, error_status
+    return local_ut, updated_num, error_status
 
 
 def check_keys_sync(table_name, key_columns, engine_source, engine_local):
@@ -207,8 +211,10 @@ def check_keys_sync(table_name, key_columns, engine_source, engine_local):
     :param engine_local: 
     :return: 
     """
+    source_ut = sync_helper.query_local_table_latest_time(table_name, engine_source)
+    local_ut = sync_helper.query_local_table_latest_time(table_name, engine_local)
     compared_keys_generator = sync_helper.compare_main_keys_generator(table_name, key_columns, engine_source,
-                                                                      engine_local)
+                                                                      engine_local, latest=max([source_ut, local_ut]))
     check_jobs = Queue()
     check_results = Queue()
     check_status = Queue()
@@ -220,12 +226,14 @@ def check_keys_sync(table_name, key_columns, engine_source, engine_local):
     threading_check.create_threads()
     threading_check.add_jobs(compared_keys_generator)
     updated_num, deleted_num, error_status = threading_check.process()
-    return updated_num, deleted_num, error_status
+    return updated_num, deleted_num, error_status, local_ut
 
 
 def delete_record(table_name, key_columns, engine_source, engine_local):
+    source_ut = sync_helper.query_local_table_latest_time(table_name, engine_source)
+    local_ut = sync_helper.query_local_table_latest_time(table_name, engine_local)
     compared_keys_generator = sync_helper.compare_main_keys_generator(table_name, key_columns, engine_source,
-                                                                      engine_local)
+                                                                      engine_local, latest=max([source_ut, local_ut]))
     delete_jobs = Queue()
     delete_results = Queue()
     delete_status = Queue()
@@ -238,7 +246,7 @@ def delete_record(table_name, key_columns, engine_source, engine_local):
     threading_delete.add_jobs(compared_keys_generator)
     deleted_num, error_status = threading_delete.process()
 
-    return deleted_num, error_status
+    return deleted_num, error_status, local_ut
 
 
 def check_network():

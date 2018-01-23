@@ -18,7 +18,10 @@ def fetch_main_key_values(table_name, key_columns, engine, latest=None, limit=No
     sql = "SELECT CONCAT_WS('[=]',{mks}) as `key_columns` FROM {tb}".format(tb=table_name, mks=','.join(
         ["IFNULL({}, 'NULL_VALUE')".format(_) for _ in key_columns]))
     if latest:
-        sql += " WHERE update_time > '{}' ORDER BY update_time".format(latest)
+        if isinstance(latest, dict):
+            sql += " WHERE update_time > '{min}' and update_time <= '{max}'".format(**latest)
+        else:
+            sql += " WHERE update_time > '{}' ORDER BY update_time".format(latest)
     if limit:
         sql += " LIMIT {}, {}".format(*limit)
     mks = pd.read_sql(sql, engine)['key_columns'].tolist()
@@ -33,9 +36,12 @@ def query_new_record_amount(table_name, engine, latest):
     :param latest:
     :return:
     """
-    sql_num = "SELECT COUNT(*) as `num` FROM {} WHERE update_time > '{}'".format(table_name, latest)
-    num = pd.read_sql(sql_num, engine)['num'][0]
-    return num
+    sql_num = "SELECT COUNT(*) as `num`, ifnull(DATE_FORMAT(max(update_time), '%%Y-%%m-%%d %%H:%%i:%%s'), " \
+              "'{}' ) as msd FROM {} WHERE update_time > '{}'".format(latest, table_name, latest)
+    result = pd.read_sql(sql_num, engine)
+    num = result['num'][0]
+    msd = result['msd'][0]
+    return num, msd
 
 
 def main_key_values_generator(table_name, key_columns, engine, latest, num):
@@ -85,25 +91,25 @@ def delete_by_keys(table, key_columns, key_values, engine):
     return nums
 
 
-def joined_main_key_values(table_name, key_columns, source_engine, local_engine):
+def joined_main_key_values(table_name, key_columns, source_engine, local_engine, latest):
     main_key = key_columns[0]
-    source_main_key = fetch_unique_main_key(table_name, main_key, source_engine)
-    local_main_key = fetch_unique_main_key(table_name, main_key, local_engine)
+    source_main_key = fetch_unique_main_key(table_name, main_key, source_engine, latest)
+    local_main_key = fetch_unique_main_key(table_name, main_key, local_engine, latest)
     main_key_values = list(set(source_main_key).union(set(local_main_key)))
     return main_key_values
 
 
-def compare_main_keys_generator(table_name, key_columns, source_engine, local_engine):
-    main_key_values = joined_main_key_values(table_name, key_columns, source_engine, local_engine)
+def compare_main_keys_generator(table_name, key_columns, source_engine, local_engine, latest=None):
+    main_key_values = joined_main_key_values(table_name, key_columns, source_engine, local_engine, latest)
     mk_num = len(main_key_values)
     for i in range(0, mk_num, settings.MAIN_KEY_LIMIT):
         mkv = main_key_values[i: min(mk_num, settings.MAIN_KEY_LIMIT + i)]
-        yield compare_main_keys(table_name, mkv, key_columns, source_engine, local_engine)
+        yield compare_main_keys(table_name, mkv, key_columns, source_engine, local_engine, latest)
 
 
-def compare_main_keys(table_name, main_key_values, key_columns, source_engine, local_engine):
-    source_keys = fetch_distinct_keys(table_name, main_key_values, key_columns, source_engine)
-    local_keys = fetch_distinct_keys(table_name, main_key_values, key_columns, local_engine)
+def compare_main_keys(table_name, main_key_values, key_columns, source_engine, local_engine, latest):
+    source_keys = fetch_distinct_keys(table_name, main_key_values, key_columns, source_engine, latest)
+    local_keys = fetch_distinct_keys(table_name, main_key_values, key_columns, local_engine, latest)
     compared = local_keys.merge(source_keys, on=['key_columns'], suffixes=['_t', '_s'], how='outer')
     compared.update_time_t = compared.update_time_t.fillna(pd.Timestamp(1970, 1, 1, 0, 0, 1))
     deleted = compared[compared.update_time_s.isnull()]['key_columns'].apply(lambda x: x.split('[=]')).tolist()
@@ -112,19 +118,21 @@ def compare_main_keys(table_name, main_key_values, key_columns, source_engine, l
     return deleted, updated
 
 
-def fetch_distinct_keys(table, main_key_values, key_columns, engine):
+def fetch_distinct_keys(table, main_key_values, key_columns, engine, latest=None):
     sql = "SELECT CONCAT_WS('[=]',{mks}) as `key_columns`, update_time FROM {tb} " \
           "WHERE {v}".format(mk=key_columns[0], tb=table,
                              mks=','.join(["IFNULL({}, 'NULL_VALUE')".format(_) for _ in key_columns]),
                              v=_format_list_value(key_columns[0], main_key_values))
+    if latest:
+        sql += " AND update_time <= '{}'".format(latest)
     return pd.read_sql(sql, engine)
 
 
-def fetch_unique_main_key(table, main_key, engine):
+def fetch_unique_main_key(table, main_key, engine, latest):
     mk = main_key
     if main_key in ('statistic_date', 'statistic_date_std'):
         mk = "DATE_FORMAT(max({}), '%%Y-%%m-%%d') as {}".format(main_key, main_key)
-    sql = "SELECT DISTINCT {} FROM {} ORDER BY {}".format(mk, table, main_key)
+    sql = "SELECT DISTINCT {} FROM {} WHERE update_time <= '{}' ORDER BY {}".format(mk, table, latest, main_key)
     return pd.read_sql(sql, engine)[main_key].tolist()
 
 
