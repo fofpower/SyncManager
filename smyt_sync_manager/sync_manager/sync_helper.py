@@ -3,6 +3,7 @@ import pandas as pd
 from smyt_sync_manager.utils import to_sql, now
 import os
 import json
+import threading
 
 
 def fetch_main_key_values(table_name, key_columns, engine, latest=None, limit=None):
@@ -115,6 +116,7 @@ def compare_main_keys(table_name, main_key_values, key_columns, source_engine, l
     deleted = compared[compared.update_time_s.isnull()]['key_columns'].apply(lambda x: x.split('[=]')).tolist()
     updated = compared[compared.update_time_s > compared.update_time_t]['key_columns'].apply(
         lambda x: x.split('[=]')).tolist()
+    threading.Thread(target=save_check_result, args=(table_name, key_columns, deleted, updated, local_engine,)).start()
     return deleted, updated
 
 
@@ -161,6 +163,19 @@ def save_log(table_name, status, log, level, engine):
     to_sql('sync_log', engine, log_record)
 
 
+def save_check_result(table_name, key_columns, deleted, updated, local_engine):
+    if deleted:
+        record = pd.DataFrame(deleted, columns=key_columns)
+        record['action'] = 'delete'
+        record['table_name'] = table_name
+        to_sql('sync_checked_keys', local_engine, record)
+    if updated:
+        record = pd.DataFrame(updated, columns=key_columns)
+        record['action'] = 'update'
+        record['table_name'] = table_name
+        to_sql('sync_checked_keys', local_engine, record)
+
+
 def status_file_check(schema):
     file_path = "{}/{}_status.json".format(settings.DIR_PATH, schema)
     if not os.path.exists(file_path):
@@ -181,7 +196,6 @@ def handle_status_file(schema, status):
     status = dict(zip(actions, status))
     with open("{}/{}_status.json".format(settings.DIR_PATH, schema), 'w+') as fp:
         fp.write(str(status).replace('\'', '"'))
-
 
 # if __name__ == '__main__':
 #     from config.settings import create_db_connection, SOURCE_DB_PARAMS, LOCAL_DB_PARAMS, SCHEMA_DICT, DIR_PATH
