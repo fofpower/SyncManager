@@ -164,16 +164,21 @@ def save_log(table_name, status, log, level, engine):
 
 
 def save_check_result(table_name, key_columns, deleted, updated, local_engine):
+    records = []
     if deleted:
-        record = pd.DataFrame(deleted, columns=key_columns)
-        record['action'] = 'delete'
-        record['table_name'] = table_name
-        to_sql('sync_checked_keys', local_engine, record)
+        record_d = pd.DataFrame(deleted, columns=key_columns)
+        record_d['action'] = 'delete'
+        record_d['table_name'] = table_name
+        records.append(record_d)
+        # to_sql('sync_checked_keys', local_engine, record)
     if updated:
-        record = pd.DataFrame(updated, columns=key_columns)
-        record['action'] = 'update'
-        record['table_name'] = table_name
-        to_sql('sync_checked_keys', local_engine, record)
+        record_u = pd.DataFrame(updated, columns=key_columns)
+        record_u['action'] = 'update'
+        record_u['table_name'] = table_name
+        records.append(record_u)
+    if len(records):
+        records = pd.concat(records)
+        to_sql('sync_checked_keys', local_engine, records)
 
 
 def status_file_check(schema):
