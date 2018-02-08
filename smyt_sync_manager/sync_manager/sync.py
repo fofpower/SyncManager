@@ -146,7 +146,7 @@ def update_table(param):
         sync_helper.save_log(table_name, 0, "Break with updating with error {}".format(update_error), 'UPDATE-1',
                              _local_engine)
 
-        sql = "DELETE FROM {} WHERE update_time > {}".format(table_name, latest_update_time)
+        sql = "DELETE FROM {} WHERE update_time > '{}'".format(table_name, latest_update_time)
         _local_engine.execute(sql)
         sync_helper.save_log(table_name, 0, "Rollback with error {}".format(update_error), 'UPDATE-1', _local_engine)
 
