@@ -93,19 +93,19 @@ smyt-sync-task -a sync
 
 1. 更新日志：
 
-**level说明**
+    **level说明**
 
-level定位脚本运行到何处
+    level定位脚本运行到何处
 
-|level|位置|
-|:---|:---|
-|UPDATE-0|选中主键从源表取数据, 插入到本地表|
-|DELETE-0|选中主键, 删除本地表中的记录|
-|INSERT-0|将增改数据插入本地表|
-|UPDATE-1|更新本地表|
-|DELETE-1|从本地表中删除记录|
-|CHECK-1|全表检查, 增改删记录|
-|TABLE_STRUCTURE|表结构检查|
+    |level|位置|
+    |:---|:---|
+    |UPDATE-0|选中主键从源表取数据, 插入到本地表|
+    |DELETE-0|选中主键, 删除本地表中的记录|
+    |INSERT-0|将增改数据插入本地表|
+    |UPDATE-1|更新本地表|
+    |DELETE-1|从本地表中删除记录|
+    |CHECK-1|全表检查, 增改删记录|
+    |TABLE_STRUCTURE|表结构检查|
 
 
 2. 错误日志 
