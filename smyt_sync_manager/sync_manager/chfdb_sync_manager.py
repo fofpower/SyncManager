@@ -1,4 +1,5 @@
-from .sync import sync_chfdb, check_chfdb, update_schema, check_schema, check_deleted, sync_schema, sync_table
+from .sync import sync_chfdb, check_chfdb, update_schema, check_schema, check_deleted, sync_schema, \
+    sync_table, check_schema_structure, check_structure
 from smyt_sync_manager.config import settings
 import os
 import argparse
@@ -8,7 +9,7 @@ from importlib import reload
 def handle_commandline():
     parser = argparse.ArgumentParser()
     parser.add_argument("-a", "--action", type=str, default='sync',
-                        help="sync, update, remove, check")
+                        help="sync, update, remove, check, structure")
     parser.add_argument("-s", "--schema", type=str, default=None,
                         help="{}".format(', '.join(settings.SYNC_SCHEMA)))
     parser.add_argument("-t", "--table", type=str, default=None,
@@ -69,6 +70,11 @@ def main():
             sync_table(schema, table, action)
         else:
             check_deleted(schema)
+    elif action == 'structure':
+        if schema:
+            check_schema_structure(schema)
+        else:
+            check_structure()
     else:
         raise KeyError(
             'Args (schema: {}, table: {}, action: {}, drop_deleted: {}) not supported'.format(schema, table, action,

@@ -25,6 +25,37 @@ def check_chfdb():
         check_schema(schema)
 
 
+def check_structure():
+    for schema in settings.SYNC_SCHEMA:
+        check_schema_structure(schema)
+
+
+def check_schema_structure(schema):
+    print("Start schema {} structure checking".format(schema))
+    tables = fetch_schema_tables(schema)
+    params = [{'schema': schema, 'table': k, 'key_columns': v} for k, v in tables.items()]
+    for param in params:
+        # if param['table'] == 'fund_info':
+        check_table_structure(param)
+    print("Schema {} structure checked".format(schema))
+
+
+def check_table_structure(param):
+    schema = param.get('schema')
+    table_name = param.get('table')
+    _source_engine = create_db_connection(settings.SOURCE_DB_PARAMS, schema)
+    _local_engine = create_db_connection(settings.LOCAL_DB_PARAMS, settings.SCHEMA_DICT.get(schema))
+
+    status = {'table_name': table_name, 'start_time': now(), 'status': 'Done'}
+    if not check_local_table(table_name, _source_engine, _local_engine):
+        structure_changed_error(table_name, status, _local_engine)
+        return
+    else:
+        sync_helper.save_log(table_name, 1, "Structure Check passed", 'TABLE_STRUCTURE', _local_engine)
+        status.update({'updated': 0, 'deleted': 0, 'end_time': now()})
+        save_sync_status(status, _local_engine)
+
+
 def check_schema(schema):
     check_network()
     check_status_file(schema)
@@ -308,7 +339,9 @@ def fetch_schema_tables(schema):
     fp.close()
     return tables
 
-# if __name__ == '__main__':
+
+if __name__ == '__main__':
+    check_structure()
 #     schema = 'product'
 #     table = 'fund_info'
 #     table_dict = fetch_schema_tables(schema)
