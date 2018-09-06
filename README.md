@@ -1,16 +1,13 @@
 ﻿# 数据库同步脚本使用说明
 
-[toc]
 
 # 一. 环境要求
-- linux系统
 - python3.5
 - requirements.txt中的python包
 
 
-
 # 二. 配置文件
-位于smyt_sync_manager/config
+目录：smyt_sync_manager/config
 
 ## 1，数据库配置
 文件：db_setting.yml
@@ -27,17 +24,18 @@ db_target:
   user: yourUser
   passwd: yourPwd
 ```
-其中db_source为源数据库的配置信息，db_target为目标数据库的配置信息。
+其中：
+1，db_source为源数据库的配置信息
+2，db_target为目标数据库的配置信息
 
 
 ## 2，需要同步的源库与目标库的库名映射
 
-schema_map为源库与目标库的库名映射，键是源库名, 值为本地库名
+schema_map为源库与目标库的库名映射，键是源库名, 值为目标库名
 
 ```python
 {
-  
-  # 配置库名映射, 键是源库名, 值为本地库名
+  # 配置库名映射, 键是源库名, 值为目标库名
   "schema_map": {
     "product": "product_sm",
     "product_mutual": "product_gm"
@@ -65,18 +63,18 @@ schema_map为源库与目标库的库名映射，键是源库名, 值为本地�
 }
 ```
 
-## 4，同步状态表
-在本地数据库中运行sync_status.sql文件, 新建4张同步状态表
+## 4，创建同步状态表
+在目标数据库中运行sync_status.sql文件, 新建4张同步状态表
 
-## 5，新建目标库的表结构
-将源库的表结构在目标库中创建
+## 5，创建目标库的表结构
+将源库的表结构在目标库中全部创建
 
 
 # 三. 启动脚本
 
-进入脚本目录, 运行
+命令窗口进入脚本目录, 运行
 ```
-/usr/local/python3.5 main.py -a sync
+# python3.5 main.py -a sync
 ```
 
 **参数说明**
@@ -123,7 +121,7 @@ schema_map为源库与目标库的库名映射，键是源库名, 值为本地�
 
 ## 2，运行
 
-在当前目录执行
+命令窗口在当前目录下执行
 ```
 # nohup python3 cron.py 0 17 * * *
 ```
