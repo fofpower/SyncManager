@@ -11,7 +11,7 @@ def handle_commandline():
     parser.add_argument("-a", "--action", type=str, default='sync',
                         help="sync, update, remove, check, structure")
     parser.add_argument("-s", "--schema", type=str, default=None,
-                        help="{}".format(', '.join(settings.SYNC_SCHEMA)))
+                        help="{}".format(', '.join(settings.SCHEMA_DICT.keys())))
     parser.add_argument("-t", "--table", type=str, default=None,
                         help="specify a table to sync")
     parser.add_argument("-d", "--drop_deleted", type=str, default='off',

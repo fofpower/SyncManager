@@ -13,20 +13,20 @@ from queue import Queue
 
 def sync_chfdb():
     # 更新
-    for schema in settings.SYNC_SCHEMA:
+    for schema in settings.SCHEMA_DICT.keys():
         update_schema(schema)
     if settings.DROP_DELETED:
-        for schema in settings.SYNC_SCHEMA:
+        for schema in settings.SCHEMA_DICT.keys():
             check_deleted(schema)
 
 
 def check_chfdb():
-    for schema in settings.SYNC_SCHEMA:
+    for schema in settings.SCHEMA_DICT.keys():
         check_schema(schema)
 
 
 def check_structure():
-    for schema in settings.SYNC_SCHEMA:
+    for schema in settings.SCHEMA_DICT.keys():
         check_schema_structure(schema)
 
 
@@ -315,7 +315,7 @@ def _query_table_columns(table_name, engine):
 
 
 def structure_changed_error(table_name, status, engine):
-    log = "Table structure has changed, please contact us."
+    log = "Table structure has changed, or Table not exists."
     sync_helper.save_log(table_name, 0, log, 'TABLE_STRUCTURE', engine)
 
     status.update({'updated': 0, 'deleted': 0, 'end_time': now(), 'error_info': log,
@@ -330,7 +330,8 @@ def save_sync_status(status, engine):
 def check_status_file(schema):
     lt_status = sync_helper.status_file_check(schema)
     if lt_status:
-        raise UpdateError(('StautsError', lt_status))
+        print(UpdateError(('StautsError', lt_status)))
+
 
 
 def fetch_schema_tables(schema):

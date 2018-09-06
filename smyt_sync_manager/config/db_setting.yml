@@ -1,0 +1,11 @@
+db_source:
+  host: yourSourceIP
+  port: yourSourcePort
+  user: yourUser
+  passwd: yourPwd
+
+db_target:
+  host: yourTargetIP
+  port: yourTargetPort
+  user: yourUser
+  passwd: yourPwd

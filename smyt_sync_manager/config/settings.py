@@ -31,7 +31,7 @@ def fetch_schema_keys(schema):
 
 
 def fetch_keys():
-    for schema in SYNC_SCHEMA:
+    for schema in SCHEMA_DICT.keys():
         fetch_schema_keys(schema)
 
 
@@ -46,12 +46,12 @@ def _read_schema_config(path):
     f = open(path)
     configs = json.load(f)
     f.close()
-    return configs.get('schema', []), configs.get('schema_map', {})
+    return configs.get('schema_map', {})
 
 
 def _check_configfile():
     _checked = []
-    for schema in SYNC_SCHEMA:
+    for schema in SCHEMA_DICT.keys():
         _checked.append(os.path.exists(os.path.join(DIR_PATH, '{}.json'.format(schema))))
     if not all(_checked):
         fetch_keys()
@@ -59,22 +59,18 @@ def _check_configfile():
 
 RECORD_Id = generate_uuid()
 
-SYNC_SCHEMA, SCHEMA_DICT = _read_schema_config("{}/schema_config.json".format(DIR_PATH))
+SCHEMA_DICT = _read_schema_config("{}/schema_config.json".format(DIR_PATH))
 
-LOCAL_DB_PARAMS = _read_database_params("{}/local_db_setting.yml".format(DIR_PATH))
-
-SOURCE_DB_PARAMS = _read_database_params("{}/source_db_setting.yml".format(DIR_PATH))
+db_yml = _read_database_params("{}/db_setting.yml".format(DIR_PATH))
+LOCAL_DB_PARAMS = db_yml.get('db_target')
+SOURCE_DB_PARAMS = db_yml.get('db_source')
 
 _check_configfile()
 
-LIMIT_RECORDS = 2000
-
-MAIN_KEY_LIMIT = 50
-
-DROP_DELETED = False
-
-CONCURRENCY = 4
-
-PROCESS = 4
-
+# 可配置
+LIMIT_RECORDS = 2000  #每次操作的数据条数
+MAIN_KEY_LIMIT = 50 #
+DROP_DELETED = False # 正常同步时是否校对主键, 移除源库中已删除的记录
+CONCURRENCY = 4  # 运行线程的上限数量
+PROCESS = 2      # 运行进程的数量
 IFNULL_VALUE = 'NULL_VALUE'

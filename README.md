@@ -2,69 +2,81 @@
 
 [toc]
 
-## 一. 环境要求
-linux系统, 安装python3.5, pip, git
+# 一. 环境要求
+- linux系统
+- python3.5
+- requirements.txt中的python包
 
 
-## 二. 安装脚本
 
-root权限运行
+# 二. 配置文件
+位于smyt_sync_manager/config
 
+## 1，数据库配置
+文件：db_setting.yml
+```angular2html
+db_source:
+  host: yourSourceIP
+  port: yourSourcePort
+  user: yourUser
+  passwd: yourPwd
+
+db_target:
+  host: yourTargetIP
+  port: yourTargetPort
+  user: yourUser
+  passwd: yourPwd
 ```
-git clone https://github.com/fofpoer/SyncManager.git
-
-# 进入SyncManager目录
-python3 setup.py install
-
-```
+其中db_source为源数据库的配置信息，db_target为目标数据库的配置信息。
 
 
-## 三. 配置文件
+## 2，需要同步的源库与目标库的库名映射
 
-1. 运行脚本前需先创建配置文件, **脚本需在配置文件目录下运行**, 配置文件包括。
+schema_map为源库与目标库的库名映射，键是源库名, 值为本地库名
 
-```
-# 本地数据库配置
-local_db_setting.yaml
-
-# 源数据库配置
-source_db_setting.yaml
-
-# 需要同步的库, 及源库与本地库的库名映射
-schema_config.json
-
-# 需要同步的表及表的主键(可自动生成)
-database.json
-```
-
-2. 在local_db_setting.yaml和source_db_setting.yaml文件中配置数据库连接参数
-
-3. 在schema_config.json文件中:
-
-```
+```python
 {
-    # 需要同步的源库名
-    "schema":
-        [
-            SOURCE_SCHEMA_NAME
-        ]
-
-    # 配置库名映射, 键是源库名, 值为本地库名。
-    "schema_map":
-        {
-            SOURCE_SCHEMA_NAME:LOCAL_SCHEMA_NAME
-        }
+  
+  # 配置库名映射, 键是源库名, 值为本地库名
+  "schema_map": {
+    "product": "product_sm",
+    "product_mutual": "product_gm"
+  }
 }
 ```
 
-4. 在本地数据库中运行sync_status.sql文件, 新建4张同步状态表
+## 3，需要同步的表及表的主键
+> 可自动生成，生成后可配置需要同步的表
 
-
-## 四. 启动脚本
-
-进入配置文件目录, 运行
+例如：product库会生成product.json文件
+```python
+{
+  "org_monthly_index_static": [
+    "org_id",
+    "statistic_date",
+    "index_id"
+  ],
+  "fund_weekly_index": [
+    "index_id",
+    "statistic_date",
+    "index_method",
+    "data_source"
+  ],
+}
 ```
-smyt-sync-task -a sync
+
+## 4，同步状态表
+在本地数据库中运行sync_status.sql文件, 新建4张同步状态表
+
+## 5，新建目标库的表结构
+将源库的表结构在目标库中创建
+
+
+# 三. 启动脚本
+
+进入脚本目录, 运行
+```
+/usr/local/python3.5 main.py -a sync
 ```
 
 **参数说明**
@@ -91,6 +103,34 @@ smyt-sync-task -a sync
 
 **由于校对主键耗时很长, 建议：目前每日只运行更新, 每隔一段时间运行全表检查或启用drop_deleted正常同步**
 
+# 四. 配置定时任务
+
+## 1. 参数
+采用crontab语法
+
+```
+0    2    *    *    6
+*    *    *    *    * 
+-    -    -    -    - 
+|    |    |    |    |    
+|    |    |    |    |    
+|    |    |    |    +----- day of week (0 - 7) (Sunday=0 or 7)
+|    |    |    +---------- month (1 - 12)
+|    |    +--------------- day of month (1 - 31)
+|    +-------------------- hour (0 - 23)
++------------------------- min (0 - 59)
+```
+
+## 2，运行
+
+在当前目录执行
+```
+# nohup python3 cron.py 0 17 * * *
+```
+
+> nohup命令将python脚本在后端执行，输出在nohup.out文件中
+
+
 ## 五. 提示信息
 
 1. 更新日志：
@@ -116,33 +156,4 @@ smyt-sync-task -a sync
 - 若启动时直接抛出UpdateError('StatusError', ), 请检查之前运行的任务是否已正常完成。**如需要强制启动, 请进入配置文件目录删除?_status.json文件**
 - 若遇到其他错误, 请联系我们, 并将错误日志发送给我们。
 
-## 六. 配置定时任务
 
-1. 查询smyt-sync-task的绝对路径
-
-```
-whereis smyt-sync-task
-# path_to_smyt_sync_task
-PATH_TO_TASK
-```
-
-2. 新建shell脚本
-
-```
-#!/usr/bin/env bash
-echo "Sync Job start!"
-
-# 视资源占用情况, 酌情配置可选参数
-DROP_DELETE='off'
-CONCURRENCY=4
-PROCESS=4
-RECORD_LIMIT=2000
-KEY_LIMIT=50
-
-cd path_to_config_dir #填写配置目录路径
-PATH_TO_TASK -a sync  -c ${CONCURRENCY} -rl ${RECORD_LIMIT} -kl ${KEY_LIMIT} -p ${PROCESS} -d ${DROP_DELETE}
-echo "Sync Job done!"
-
-```
-
-3. 创建crontab任务, 定时运行shell脚本
