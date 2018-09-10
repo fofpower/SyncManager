@@ -123,7 +123,7 @@ schema_map为源库与目标库的库名映射，键是源库名, 值为目标�
 
 命令窗口在当前目录下执行
 ```
-# nohup python3 cron.py 0 17 * * *
+# nohup python3 cron.py "0 17 * * *"
 ```
 
 > nohup命令将python脚本在后端执行，输出在nohup.out文件中

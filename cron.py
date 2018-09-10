@@ -11,8 +11,8 @@ def quote_send_sh_job():
 if __name__ == '__main__':
     print(sys.argv)
     scheduler = BlockingScheduler()
-    if len(sys.argv) == 6:
-        params = sys.argv[1:]
+    if len(sys.argv) == 2:
+        params = sys.argv[1].split(" ")
         scheduler.add_job(quote_send_sh_job, 'cron', minute=params[0], hour=params[1], day=params[2], month=params[3], day_of_week=params[4])
         print("scheduler running! crontab: {}".format(" ".join(params)))
     else:
