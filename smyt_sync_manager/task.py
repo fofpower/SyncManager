@@ -82,6 +82,10 @@ def sync_task(action, schema, drop_deleted, table, key_limit, record_limit, conc
 def execute_from_commandline():
     sync_task(*handle_commandline())
 
+def execute():
+    sync_task(action='sync', schema=None, drop_deleted=settings.DROP_DELETED, table=None, key_limit=settings.MAIN_KEY_LIMIT, record_limit=settings.LIMIT_RECORDS, concurrency=settings.CONCURRENCY, processes=settings.PROCESS)
+
 
 if __name__ == '__main__':
-    execute_from_commandline()
+    # execute_from_commandline()
+    execute()

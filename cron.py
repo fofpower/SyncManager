@@ -6,7 +6,7 @@ from smyt_sync_manager import task
 
 def quote_send_sh_job():
     print('task start at ', datetime.datetime.now())
-    task.execute_from_commandline()
+    task.execute()
 
 if __name__ == '__main__':
     print(sys.argv)
@@ -19,3 +19,5 @@ if __name__ == '__main__':
         scheduler.add_job(quote_send_sh_job, 'cron', hour='20') #每天20点启动
         print("param error! user default crontab: 0 20 * * *")
     scheduler.start()
+
+    # task.execute()
